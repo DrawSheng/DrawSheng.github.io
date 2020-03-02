@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>云之彼端</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://134.175.222.150/"/>
+  <updated>2020-03-02T01:27:52.633Z</updated>
+  <id>http://134.175.222.150/</id>
+  
+  <author>
+    <name>DrawSheng</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>细数hexo部署CentOS 7.6遇到的坑（上）</title>
+    <link href="http://134.175.222.150/2020/03/01/%E7%BB%86%E6%95%B0hexo%E9%83%A8%E7%BD%B2%E8%85%BE%E8%AE%AF%E4%BA%91CentOS%207.6%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/"/>
+    <id>http://134.175.222.150/2020/03/01/%E7%BB%86%E6%95%B0hexo%E9%83%A8%E7%BD%B2%E8%85%BE%E8%AE%AF%E4%BA%91CentOS%207.6%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/</id>
+    <published>2020-03-01T14:14:30.000Z</published>
+    <updated>2020-03-02T01:27:52.633Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="CeotOS-7-6初接触"><a href="#CeotOS-7-6初接触" class="headerlink" title="CeotOS 7.6初接触"></a>CeotOS 7.6初接触</h2><p>今年二月中旬，头脑一热买了腾讯云学生服务器一年和drawsheng.cn域名3年（这个我还觉得挺划算的）前几天备案完成，从今天开始研究了好久终于将整个博客移到了腾讯云上。</p><h3 id="对比云服务器以及github和码云"><a href="#对比云服务器以及github和码云" class="headerlink" title="对比云服务器以及github和码云"></a>对比云服务器以及github和码云</h3><table><thead><tr><th align="center">github</th><th align="center">码云(gitee)</th><th align="center">腾讯云</th></tr></thead><tbody><tr><td align="center">免费</td><td align="center">免费</td><td align="center">付费购买云服务</td></tr><tr><td align="center">访问速度慢</td><td align="center">访问速度相对快</td><td align="center">访问速度相对快</td></tr><tr><td align="center">deploy后能自动更新</td><td align="center">不能免费自动更新，需要手动</td><td align="center">deploy后可以自动更新</td></tr><tr><td align="center">域名不能完全自定义</td><td align="center">域名不能完全自定义</td><td align="center">可以购买域名并且绑定，备案方便</td></tr></tbody></table><p>由此可见，如果想要长期稳定地维持一个网站，相对来说比较适合在腾讯云上部署</p><p>今天算是真正意义上第一次使用类linux的操作系统，相比四年前我已经对这个黑框框很熟悉了，上手也比较快<br><del>不过用那些命令来操作主机还真有点费劲啊</del></p><p><img alt="云主机的真面目" data-src="https://s2.ax1x.com/2020/03/01/32UTij.png" class="lozad"></p><h3 id="第一坑：cmd输入密码"><a href="#第一坑：cmd输入密码" class="headerlink" title="第一坑：cmd输入密码"></a>第一坑：cmd输入密码</h3><p>一般来说，我们目前输入密码时最常见到的应该是*号，输入密码时它可以起到打码的作用<br>然而cmd里输入密码的时候根本就没有反应，第一次见到我还以为输入法有问题试了好久,后来才发现是这类终端的特色（不过为什么我当时输正确密码也没反应呢，怪事）</p><h3 id="第二坑：ssh-配置"><a href="#第二坑：ssh-配置" class="headerlink" title="第二坑：ssh 配置"></a>第二坑：ssh 配置</h3><p>ssh(安全外壳协议)，这个属于信息安全专业领域了，不过我对其没什么印象了，特此复习一下</p><p>从客户端来看，SSH提供两种级别的安全验证。  </p><h4 id="第一种级别（基于口令的安全验证）"><a href="#第一种级别（基于口令的安全验证）" class="headerlink" title="第一种级别（基于口令的安全验证）"></a>第一种级别（基于口令的安全验证）</h4><p>只要你知道自己帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但是不能保证你正在连接的服务器就是你想连接的服务器。可能会有别的服务器在冒充真正的服务器，也就是受到“中间人”这种方式的攻击。  </p><h4 id="第二种级别（基于密匙的安全验证）"><a href="#第二种级别（基于密匙的安全验证）" class="headerlink" title="第二种级别（基于密匙的安全验证）"></a>第二种级别（基于密匙的安全验证）</h4><p>需要依靠密匙，也就是你必须为自己创建一对密匙，并把公用密匙放在需要访问的服务器上。如果你要连接到SSH服务器上，客户端软件就会向服务器发出请求，请求用你的密匙进行安全验证。流程如下：  </p><p><img alt="SSH密钥认证原理图" data-src="https://s2.ax1x.com/2020/03/02/322l1U.png" class="lozad">  </p><p>1：ssh客户端生成一个 key ID（这个ID是基于密钥对的公钥算出来的，具体格式未知），再一次说明，这个密钥对不是服务器的，使用会话密钥加密后发送给服务器端。<br>2：服务器端从 authorized_keys 文件中匹配 key ID，如果匹配，此时还不能证明这个ssh客户端是真正的客户端密钥对的主人。<br>3：服务器端生成一个随机数，然后用客户端的公钥加密后发送给客户端。<br>4：客户端使用自己的私钥解密出服务器端的随机数，注意，如果某个攻击者仅仅有客户端的公钥，它是无法解密出的，因为攻击者没有对应的私钥。<br>5：为了向服务器端证明它能解密出这个随机数，客户端将解密出的随机数用会话密钥加密，将得到的值进行MD5运算。然后将这个值发送给服务器，以便响应（4）阶段的消息。<br>6：服务器端对原始随机数也使用会话密钥加密，再进行MD5计算，如果得出的值和（5）阶段客户端发送的一致，代表双方的登录校验通过。<br>服务器端使用服务器密钥对公钥指纹像客户端证明它就是真正的服务器端；而客户端使用它自己的密钥对向服务器证明它就是真实的客户端。<br>由于在验证过程中，客户端密钥对的公钥不会传输，所以即使遇到中间人攻击，攻击者也不会获取到公钥（不考虑客户端机器本身遇到攻击了）。如果客户端的公钥曾经泄漏过，攻击者也不能成功登录ssh服务器，原因是攻击者没有私钥，无法解密出随机数，从而不能完成验证。 </p><p>相比使用传统的口令认证，很明显使用密钥来进行验证更加安全。但这种方式也不是没有缺点，因为公钥和私钥的存储位置是固定的，所以这种方式下为了安全起见最好隔一段时间更新一次密钥</p><h4 id="使用SSH连接云主机实现免密码登陆"><a href="#使用SSH连接云主机实现免密码登陆" class="headerlink" title="使用SSH连接云主机实现免密码登陆"></a>使用SSH连接云主机实现免密码登陆</h4><h4 id="本地主机-客户端"><a href="#本地主机-客户端" class="headerlink" title="本地主机(客户端)"></a>本地主机(客户端)</h4><ol><li>打开git bash，首先在本地主机生成密钥对  <code>ssh-keygen -t rsa -C &quot;your_email@example.com&quot;</code>  </li><li>在C:\Users\Username.ssh 可以找到一个 id—rsa 文件(私钥)以及 id-rsa.pub(公钥) 文件，用记事本打开公钥文件，复制内容</li></ol><h4 id="云主机-服务器端"><a href="#云主机-服务器端" class="headerlink" title="云主机(服务器端)"></a>云主机(服务器端)</h4><ol><li><p>创建一个名字叫git的用户,并且给予权限  </p> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">adduser git</span><br><span class="line">passwd git</span><br><span class="line">chmod 740 &#x2F;etc&#x2F;sudoers</span><br><span class="line">vim &#x2F;etc&#x2F;sudoers</span><br></pre></td></tr></table></figure>  </li><li><p>按i进入编辑模式，找到如下  </p><p> ##Allow root to run any commands anywhere<br> root    ALL=(ALL)       ALL<br> 在下一行添加  <code>git ALL=(ALL) ALL</code><br> 按ESC，保存并退出 <code>:wq</code><br> 恢复权限 <code>chmod 400 /etc/sudoers</code></p></li><li><p>切换至 git 用户，创建 .ssh 文件夹以及 authorized_keys 文件并将本地的 id_rsa.pub 文件内容粘贴到里面。  </p> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">su git</span><br><span class="line">mkdir ~&#x2F;.ssh</span><br><span class="line">vim ~&#x2F;.ssh&#x2F;authorized_keys</span><br></pre></td></tr></table></figure></li></ol><p>同理还是输入i进入编辑模式，编辑完后ESC退出，:wq保存并退出  </p><ol start="4"><li><p>设置.ssh 文件夹以及authorized_keys权限  </p> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">chmod 600 .ssh&#x2F;authorzied_keys</span><br><span class="line">chmod 700 .ssh</span><br></pre></td></tr></table></figure></li></ol><h4 id="回到本地主机"><a href="#回到本地主机" class="headerlink" title="回到本地主机"></a>回到本地主机</h4><p>配置本地连接设置，使用记事本打开C:\Users\Username.ssh/config 并写入</p><pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Host hexo</span><br><span class="line">HostName 你的服务器ip地址</span><br><span class="line">Port 22</span><br><span class="line">User git</span><br><span class="line">IdentityFile ~&#x2F;.ssh&#x2F;id_rsa</span><br></pre></td></tr></table></figure></code></pre><p>测试连接效果，如果连接成功可以远程使用云主机<br><code>ssh -v git@hexo</code></p><h4 id="一些常见错误和一个SR级别的错误"><a href="#一些常见错误和一个SR级别的错误" class="headerlink" title="一些常见错误和一个SR级别的错误"></a>一些常见错误和一个SR级别的错误</h4><p>常见错误都在git那边，下篇文章再说吧<br>说个比较稀有的，卡了我三个小时的错误：当密钥配置成功，也写入了authorized_key中，但还是要我们输入密码  </p><p><img alt="我们一直以来的努力全部木大？" data-src="https://s2.ax1x.com/2020/03/02/32c3CT.png" class="lozad"></p><p>解决方法：查看是否是/home下git用户权限错误<br><img alt data-src="https://s2.ax1x.com/2020/03/02/32gEIx.png" class="lozad"></p><pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -l &#x2F;home</span><br><span class="line">sudo chown git -R &#x2F;home&#x2F;git;</span><br><span class="line">sudo chgrp git -R &#x2F;home&#x2F;git;</span><br></pre></td></tr></table></figure></code></pre><p>摸了，剩下的明天再写  </p><p><img alt="咕咕咕" data-src="https://imgsa.baidu.com/forum/w%3D580/sign=2e7cef2a0655b3199cf9827d73a88286/6e061d950a7b0208fa4b9cca6ed9f2d3572cc81f.jpg" class="lozad"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;CeotOS-7-6初接触&quot;&gt;&lt;a href=&quot;#CeotOS-7-6初接触&quot; class=&quot;headerlink&quot; title=&quot;CeotOS 7.6初接触&quot;&gt;&lt;/a&gt;CeotOS 7.6初接触&lt;/h2&gt;&lt;p&gt;今年二月中旬，头脑一热买了腾讯云学生服务器一年和dr
+      
+    
+    </summary>
+    
+    
+      <category term="学习记录" scheme="http://134.175.222.150/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"/>
+    
+    
+      <category term="CentOS 7.6" scheme="http://134.175.222.150/tags/CentOS-7-6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>今日完成事项以及To do list</title>
+    <link href="http://134.175.222.150/2020/02/12/%E4%BB%8A%E6%97%A5%E5%AE%8C%E6%88%90%E4%BA%8B%E9%A1%B9%E4%BB%A5%E5%8F%8ATo-do-list/"/>
+    <id>http://134.175.222.150/2020/02/12/%E4%BB%8A%E6%97%A5%E5%AE%8C%E6%88%90%E4%BA%8B%E9%A1%B9%E4%BB%A5%E5%8F%8ATo-do-list/</id>
+    <published>2020-02-12T15:38:30.000Z</published>
+    <updated>2020-02-12T16:24:42.206Z</updated>
+    
+    <content type="html"><![CDATA[<hr><h2 id="坚持每篇博文用不一样的封面！"><a href="#坚持每篇博文用不一样的封面！" class="headerlink" title="坚持每篇博文用不一样的封面！"></a>坚持每篇博文用不一样的封面！</h2><p>今天完成了对博客的美化，以及将博客放在码云上<br>这样访问的速度快很多啦！！<br>明后天学学如何将博客部署在腾讯云上面，备案啥的好麻烦的（还想加个新的live2d纸片人啊）<br>博客插入图片也挺麻烦啊<br>那么今天就到此为止，お疲れ様！</p><hr><p><img alt="小憩一会" data-src="https://s2.ax1x.com/2020/02/12/1bWLIH.gif" class="lozad"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;hr&gt;
+&lt;h2 id=&quot;坚持每篇博文用不一样的封面！&quot;&gt;&lt;a href=&quot;#坚持每篇博文用不一样的封面！&quot; class=&quot;headerlink&quot; title=&quot;坚持每篇博文用不一样的封面！&quot;&gt;&lt;/a&gt;坚持每篇博文用不一样的封面！&lt;/h2&gt;&lt;p&gt;今天完成了对博客的美化，以及将博客
+      
+    
+    </summary>
+    
+    
+      <category term="随笔" scheme="http://134.175.222.150/categories/%E9%9A%8F%E7%AC%94/"/>
+    
+    
+      <category term="待办清单" scheme="http://134.175.222.150/tags/%E5%BE%85%E5%8A%9E%E6%B8%85%E5%8D%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>建博客第一天的感想</title>
+    <link href="http://134.175.222.150/2020/02/11/%E5%BB%BA%E5%8D%9A%E5%AE%A2%E7%AC%AC%E4%B8%80%E5%A4%A9%E7%9A%84%E6%84%9F%E6%83%B3/"/>
+    <id>http://134.175.222.150/2020/02/11/%E5%BB%BA%E5%8D%9A%E5%AE%A2%E7%AC%AC%E4%B8%80%E5%A4%A9%E7%9A%84%E6%84%9F%E6%83%B3/</id>
+    <published>2020-02-11T15:09:31.000Z</published>
+    <updated>2020-02-12T03:03:53.685Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="我的感想"><a href="#我的感想" class="headerlink" title="我的感想:"></a>我的感想:</h2><p>研究了好久，终于踏出了第一步<br>学习到了很多git和github相关的知识，Markdown我还不会<br>今天就做到这吧</p><hr>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;我的感想&quot;&gt;&lt;a href=&quot;#我的感想&quot; class=&quot;headerlink&quot; title=&quot;我的感想:&quot;&gt;&lt;/a&gt;我的感想:&lt;/h2&gt;&lt;p&gt;研究了好久，终于踏出了第一步&lt;br&gt;学习到了很多git和github相关的知识，Markdown我还不会&lt;br&gt;今天就做
+      
+    
+    </summary>
+    
+    
+      <category term="随笔" scheme="http://134.175.222.150/categories/%E9%9A%8F%E7%AC%94/"/>
+    
+    
+      <category term="随便写写" scheme="http://134.175.222.150/tags/%E9%9A%8F%E4%BE%BF%E5%86%99%E5%86%99/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://134.175.222.150/2020/02/11/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/"/>
+    <id>http://134.175.222.150/2020/02/11/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/</id>
+    <published>2020-02-11T09:44:04.000Z</published>
+    <updated>2020-02-12T03:01:57.865Z</updated>
+    
+    <content type="html"><![CDATA[<hr><p>这里（こ↑こ↓）就是博客的第一篇文章了</p><hr><p>##建站参考blog<br><a href="http://www.codesheep.cn" target="_blank" rel="noopener">www.codesheep.cn</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;hr&gt;
+&lt;p&gt;这里（こ↑こ↓）就是博客的第一篇文章了&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;##建站参考blog&lt;br&gt;&lt;a href=&quot;http://www.codesheep.cn&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;www.codesheep.cn&lt;/a&gt;&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="随笔" scheme="http://134.175.222.150/categories/%E9%9A%8F%E7%AC%94/"/>
+    
+    
+      <category term="随便写写" scheme="http://134.175.222.150/tags/%E9%9A%8F%E4%BE%BF%E5%86%99%E5%86%99/"/>
+    
+  </entry>
+  
+</feed>
